@@ -1,0 +1,117 @@
+
+body {
+  position: fixed;
+  margin-top: 10vh;
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Centers the element horizontally */
+  /*align-items: center; */ /* Optional, centers it vertically */
+  /* min-height: 190vh;  */
+  min-height: 100%;
+  overflow: scroll;
+  margin-bottom: 171px;
+}
+
+.header {
+  width: 100%; /* Or a specific width if needed */
+  /* max-width: 980px;  */
+  max-width: 100%;
+  position: fixed;
+  background-color: beige;
+  top: 0%;
+  left: 0;
+  padding-left: 3%;
+  align-content: center;
+  height: 10vh;
+  max-height: 171px;
+  }
+
+.body-internal {
+    opacity:0.8;
+    /* background-color:#ccc; */
+    position:absolute;
+    width:80%;
+    margin:0% 0%;
+    height:100%;
+    top:0px;
+    bottom: 0px;
+    left:15%;
+    /* right: 2%; */
+    justify-self: center;
+    align-self: center;
+    overflow: scroll;
+    margin-left: 10%;
+    /* display: flex;
+    flex-direction: column;
+    justify-content: space-between; */
+  }
+  
+  .button1 {
+    background-color: white; 
+    color: black; 
+    border: 2px solid #04AA6D;
+    /* background-color: #04AA6D;
+    border: none;
+    color: white; */
+    width: 100px;
+    padding: 10px 22px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+  }
+  
+  .button1:hover {
+    background-color: #04AA6D;
+    color: white;
+  }
+
+.form {
+    position: relative;
+    min-width: 50%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+    /* justify-content: space-between; */
+  }
+
+.nav-h1 {
+    position: relative;
+    font-size: 25px;
+  }
+
+.content-div{
+    position: relative;
+    display: block;
+    gap: 50px;
+    overflow-y: scroll;
+  }
+
+.input-labeel-unit{
+    position: relative;
+    display:flex;
+    width: 100%;
+
+}
+.input{
+    position: relative;
+    width: 25%;
+}
+.label {
+    position: relative;
+    width: 25%;
+}
+
+.footer {
+    position: absolute;
+    padding-left: 3%;
+    bottom:0;
+    max-height:130px;
+    min-height: 120px;
+    width: 100%;
+    padding: auto;
+    background-color: beige;
+}

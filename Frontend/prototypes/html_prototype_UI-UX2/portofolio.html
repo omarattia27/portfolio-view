@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body">
+    <header class="header">
+        <h1 class="nav-h1">Portofolio View</h1>
+    </header>
+    <div class="body-internal">
+        <div class="content-div">
+            <article class="box-1">
+                <form class="form-container">
+                    <h1 class="box-1-header">Scenario Parameters</h1>
+                    <div class="form">
+                        <div class="input-labeel-unit">   
+                            <label class="label" for="name">Enter Parameter 1: </label>
+                            <input class="input" type="text" name="name" id="name" required pattern="[A-Za-z]+" />
+                        </div>
+                        <div class="input-labeel-unit">
+                            <label class="label" for="name">Enter Parameter 2: </label>
+                            <input class="input" type="text" name="name" id="name" required pattern="[A-Za-z]+" />
+                        </div>
+                        <div class="input-labeel-unit">
+                            <label class="label" for="name">Enter Parameter 3: </label>
+                        <input class="input" type="text" name="name" id="name" required pattern="[A-Za-z]+" />
+                        </div>
+                        <div class="input-labeel-unit">
+                            <label class="label" for="name">Enter Parameter 4: </label>
+                            <input class="input" type="text" name="name" id="name" required pattern="[A-Za-z]+" />
+                        </div>
+                         <button class="button1">Submit</button>
+                    </div>
+                </form>
+            </article>
+            <article class="box-2">
+                <h2>GRAPH TO BE HERE;</h2>
+                <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
+                <script>
+                    const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
+                    const yValues = [55, 49, 44, 24, 15];
+                    const barColors = ["red", "green","blue","orange","brown"];
+                
+                    new Chart("myChart", {
+                    type: "bar",
+                    data: {
+                        labels: xValues,
+                        datasets: [{
+                        backgroundColor: barColors,
+                        data: yValues
+                        }]
+                    },
+                    options: {
+                        legend: {display: false},
+                        title: {
+                        display: true,
+                        text: "World Wine Production 2018"
+                        }
+                    }
+                });
+                </script>
+            </article>
+        </div>
+    </div>
+    <footer class="footer">
+        All copy rights are reserved to Omar Attia. @2024.
+    </footer>
+    
+</body>
+
+</html>
