@@ -11,7 +11,7 @@ df = df[df['Annual_Wage_Flag_Salaire_annuel'].isin([1,'1'])]
 
 df = df.dropna(subset=['Average_Wage_Salaire_Moyen'])
 
-df.to_csv("wages_filtered.csv") 
+#df.to_csv("wages_filtered.csv") 
 
 pass
 
@@ -34,13 +34,15 @@ planner = financial_planner(years=40, initial_savings=0)
 planner.add_salary(
     base_salary=50000,
     distribution_function=salary_increase_distribution,
+    province="BC",
+    inflation=3,
     state_obj={"base_salary": 50000},
 )
 
 # Add investment with dynamic return rate
 planner.add_investment(
+    initial_savings=0,
     investment_rate=0.1,
-    distribution_function=investment_return_distribution,
     state_obj={"base_return_rate": 0.1},
     assets_allocation_factors = {'SPY':0.6, 'VNQ':0.4}
 )

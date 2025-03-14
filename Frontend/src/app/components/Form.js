@@ -113,7 +113,7 @@ const Form = () => {
       </div>
     </div>
 
-    <hr class="h-1 bg-black border-none"/>
+    <hr className="h-1 bg-black border-none"/>
 
       {/*INITIAL_SALARY */}
       <div className="form-group">
@@ -139,7 +139,7 @@ const Form = () => {
 
       <h/>
 
-      <hr class="h-1 bg-black border-none"/>
+      <hr className="h-1 bg-black border-none"/>
 
       {/*INITIAL_RECURRING_COST */}
       <div className="form-group">
