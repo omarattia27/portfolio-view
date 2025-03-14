@@ -1,0 +1,27 @@
+.flex-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 20px;
+    padding-top: 90px; /* Adjust for navbar height */
+    width: 100%;
+  }
+  
+.component-box {
+    flex: 1;
+    max-width: 48%; /* Keep components side by side on larger screens */
+    box-sizing: border-box;
+    margin-right: auto;
+  }
+  
+@media screen and (max-width: 768px) {
+  .flex-container {
+      flex-direction: column;
+      padding-top: 20px; /* Reduce padding on smaller screens */
+  }
+  
+  .component-box {
+     max-width: 100%;
+  }
+  }
+  
