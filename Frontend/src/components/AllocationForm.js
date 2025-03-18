@@ -1,5 +1,5 @@
 import { useState } from "react";
-import './Form.css'; 
+import '../styles/Form.css'; 
 import useStore from '../store/useStore';
 // import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 

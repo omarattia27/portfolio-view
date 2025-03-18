@@ -1,8 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import OAuth2AuthorizationCodeBearer
+from authlib.integrations.starlette_client import OAuth
 from fastapi.middleware.cors import CORSMiddleware
 from API import api_call 
 from pydantic import BaseModel
 from typing import List
+import requests
+import os
 
 dic_assets = {
     "Cash": "DX-Y.NYB", 
@@ -50,6 +54,26 @@ app.add_middleware(
     allow_credentials=True,  # Allow cookies and credentials
     allow_methods=["*"],     # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],     # Allow all headers
+)
+
+# 🔹 Authentik OAuth2 Configuration
+AUTHENTIK_DOMAIN = "http://localhost:9000"
+AUTHENTIK_CLIENT_ID = os.getenv("AUTHENTIK_CLIENT_ID")
+AUTHENTIK_CLIENT_SECRET = os.getenv("AUTHENTIK_CLIENT_SECRET")
+
+oauth2_scheme = OAuth2AuthorizationCodeBearer(
+    authorizationUrl=f"{AUTHENTIK_DOMAIN}/application/o/fastapi/authorize/",  # 🔹 Required parameter
+    tokenUrl=f"{AUTHENTIK_DOMAIN}/application/o/fastapi/token/"
+)
+
+oauth = OAuth()
+oauth.register(
+    name="authentik",
+    client_id=AUTHENTIK_CLIENT_ID,
+    client_secret=AUTHENTIK_CLIENT_SECRET,
+    authorize_url=f"{AUTHENTIK_DOMAIN}/application/o/fastapi/authorize/",
+    access_token_url=f"{AUTHENTIK_DOMAIN}/application/o/fastapi/token/",
+    client_kwargs={"scope": "openid profile email"},
 )
 
 # Define the Loan model to represent individual loans
@@ -114,6 +138,22 @@ async def read_user(data: RequestBody):
     }
     
     return api_call(request_obj)
+
+# 🔹 OAuth2 Dependency for Protected Routes
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    user_info = requests.get(
+        f"{AUTHENTIK_DOMAIN}/application/o/userinfo/", 
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    if user_info.status_code != 200:
+        raise HTTPException(status_code=401, detail="Invalid authentication")
+    
+    return user_info.json()
+
+# 🔹 Protected API Route
+@app.get("/protected-data")
+async def protected_route(user: dict = Depends(get_current_user)):
+    return {"message": f"Hello, {user['preferred_username']}!"}
 
     # Call the financial_planner function with the appropriate arguments
     # return financial_planner(

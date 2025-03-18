@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Form.css'; 
+import '../styles/Form.css'; 
 import useStore from '../store/useStore';
 import AllocationForm from "./AllocationForm";
 
