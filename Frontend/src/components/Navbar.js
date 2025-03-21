@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from 'next/link';
 import "../styles/Navbar.css"
+import Image from "next/image";
+import logo from "../media/logo_v1.webp"
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -15,20 +17,19 @@ const Navbar = () => {
     setShowDropdown(!showDropdown);
   };
 
-  const AUTHENTIK_LOGOUT_URL = "http://localhost:9000/application/o/portfolio/end-session/?redirect_uri=http://localhost:3000/login";
+  const AUTHENTIK_LOGOUT_URL = "http://localhost:9000/if/flow/default-provider-invalidation-flow/?redirect_uri=http://localhost:3000/";
 
   const handleFullLogout = async () => {
     await signOut({ redirect: false });  // Remove NextAuth session
-    window.location.href = AUTHENTIK_LOGOUT_URL;  // Redirect to Authentik logout
+    //window.location.href = AUTHENTIK_LOGOUT_URL;  // Redirect to Authentik logout
   };
   
-
 
   if(session){
     return (
       <nav style={styles.navbar}>
         <div style={styles.navLogo}>
-          <Link href="/">PortfolioView</Link>
+          <Link href="/"><Image src={logo} alt="Company Logo" width={40} height={40} /> <p>Portfolio View</p></Link>
         </div >
         <ul className="ul-choices-group" style={styles.navMenu}>
           <li style={styles.navItem}>
@@ -46,7 +47,7 @@ const Navbar = () => {
                 </li>
                 <li style={styles.dropdownItem}>
                   {/* <button onClick={() => signOut({ callbackUrl: "http://localhost:3000/login" })}>Log out</button> */}
-                  <button onClick={handleFullLogout}>Logout</button>;
+                  <button onClick={handleFullLogout}>Logout</button>
                 </li>
               </ul>
             )}
@@ -58,7 +59,7 @@ const Navbar = () => {
     return (
       <nav style={styles.navbar}>
         <div style={styles.navLogo}>
-          <Link href="/">Porofolio View</Link>
+        <Link href="/"><Image src={logo} alt="Company Logo" width={40} height={40} /> <p>Portfolio View</p></Link>
         </div>
         <ul style={styles.navMenu}>
           <li style={styles.navItem}>

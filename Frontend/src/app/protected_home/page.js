@@ -1,12 +1,7 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]";
+"use client";
+import Protected from '../../components/Protected';
 
-export default async function ProtectedPage() {
-  const session = await getServerSession(authOptions);
+export default function ProtectedPage() {
+    return <><Protected/></>;
 
-  if (!session) {
-    return <p>Access Denied. Please <a href="/login">Login</a>.</p>;
-  }
-
-  return <h1>Welcome, {session.user.name}!</h1>;
 }

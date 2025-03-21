@@ -9,7 +9,7 @@ const authOptions = {
       clientId: process.env.AUTHENTIK_ID || "AUTHENTIK_CLIENT_ID",
       client_id: process.env.AUTHENTIK_CLIENT_ID,
       clientSecret: process.env.AUTHENTIK_SECRET || "AUTHENTIK_CLIENT_SECRET",
-      issuer: process.env.AUTHENTIK_ISSUER,  // Issuer URL from Authentik
+      issuer: 'http://host.docker.internal:9000/application/o/portfolio' //process.env.AUTHENTIK_ISSUER //'http://localhost:9000/application/o/portfolio' //process.env.AUTHENTIK_ISSUER,  // Issuer URL from Authentik
     })
     // ... add other providers here if needed
   ],
@@ -17,8 +17,18 @@ const authOptions = {
   session: { strategy: "jwt" },
   callbacks: {
     // (Optional) Add custom NextAuth callbacks if needed
+    // async session({ session, token, user }) {
+    //   // Example: you could attach additional user info to session here
+    //   return session;
+    // },
+    async jwt({ token, account }) {
+      if (account) {
+        token.accessToken = account.access_token; // Store access token
+      }
+      return token;
+    },
     async session({ session, token, user }) {
-      // Example: you could attach additional user info to session here
+      session.accessToken = token.accessToken; // Include in session
       return session;
     },
     // async signIn({ account, profile }) { ... } // e.g., to control sign-in
