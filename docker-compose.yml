@@ -1,0 +1,150 @@
+---
+
+services:
+
+  backend:
+    image: python:3.10 
+    container_name: backend
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./Backend:/app
+    command: bash -c "pip install --no-cache-dir -r requirements.txt && uvicorn fast_api:app --host 0.0.0.0 --port 8000 --reload"
+    networks:
+       - shared_network
+
+  frontend:
+    image: node:18
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      AUTHENTIK_CLIENT_SECRET: ${AUTHENTIK_CLIENT_SECRET}
+      AUTHENTIK_CLIENT_ID: ${AUTHENTIK_CLIENT_ID}
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: TQdVeus8JTuWtJf32SZUClEnlydHTa2akXuSMuVk5l0
+      AUTHENTIK_ISSUER: http://localhost:9000/application/o/portfolio
+    working_dir: /app
+    env_file:
+      - .env
+    volumes:
+      - ./Frontend:/app
+    command: bash -c "npm install && npm run dev"
+    depends_on:
+      - backend
+    networks:
+      - shared_network
+
+  postgresql:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${PG_PASS:?database password required}
+      POSTGRES_USER: ${PG_USER:-authentik}
+      POSTGRES_DB: ${PG_DB:-authentik}
+    env_file:
+      - .env
+    networks:
+      - shared_network
+
+  redis:
+    image: docker.io/library/redis:alpine
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    volumes:
+      - redis:/data
+    networks:
+      - shared_network
+
+  server:
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.2.1}
+    restart: unless-stopped
+    command: server
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_BOOTSTRAP_USER: ${AUTHENTIK_EMAIL__USERNAME}
+      AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_EMAIL__PASSWORD}
+      AUTHENTIK_CLIENT_SECRET: AUTHENTIK_CLIENT_SECRET
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+    volumes:
+      - ./Authentik/media:/media
+      - ./Authentik/custom-templates:/templates
+    env_file:
+      - .env
+    ports:
+      - "${COMPOSE_PORT_HTTP:-9000}:9000"
+      - "${COMPOSE_PORT_HTTPS:-9443}:9443"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - shared_network
+        
+  worker:
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.2.1}
+    restart: unless-stopped
+    command: worker
+    environment:
+      AUTHENTIK_BOOTSTRAP_USER: akadmin
+      AUTHENTIK_BOOTSTRAP_PASSWORD: Authentik_password2001
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_CLIENT_SECRET: AUTHENTIK_CLIENT_SECRET
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+    # `user: root` and the docker socket volume are optional.
+    # See more for the docker socket integration here:
+    # https://goauthentik.io/docs/outposts/integrations/docker
+    # Removing `user: root` also prevents the worker from fixing the permissions
+    # on the mounted folders, so when removing this make sure the folders have the correct UID/GID
+    # (1000:1000 by default)
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./Authentik/media:/media
+      - ./Authentik/certs:/certs
+      - ./Authentik/custom-templates:/templates
+    env_file:
+      - .env
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - shared_network
+
+volumes:
+  database:
+    driver: local
+  redis:
+    driver: local
+  
+networks:
+  shared_network:
+    driver: bridge

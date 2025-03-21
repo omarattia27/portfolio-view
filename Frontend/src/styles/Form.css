@@ -7,7 +7,8 @@
     border-radius: 8px;
     background-color: #f9f9f9;
     color: black;
-    height: calc(100vh - 100px); /* Adjust form height to fit within the viewport */
+    height: 670px;
+    /* height: calc(100vh - 150px); Adjust form height to fit within the viewport */
     overflow-y: auto; /* Enable vertical scrolling if content overflows */
   }
   

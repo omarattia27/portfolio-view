@@ -1,8 +1,8 @@
-"use client"; // Add this line at the top
+"use client";
 
 import Bar from "./Bar";
 import Form from "./Form";
-import './Dataview.css'
+import '../styles/Dataview.css'
 
 const components = [
   ["Bar", Bar],

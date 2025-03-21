@@ -1,11 +1,11 @@
 "use client"; // Add this line at the top
 
-import ResizableBox from "../ResizableBox";
+import ResizableBox from "./ResizableBox";
 import useStore from '../store/useStore';
 import { useEffect, useState, useMemo } from 'react';
 import { AxisOptions, Chart } from "react-charts";
 import axios from 'axios';
-import './Bar.css';
+import '../styles/Bar.css';
 
 export default function Bar() {
   const INFLATION = useStore((state) => state.INFLATION);
@@ -74,13 +74,21 @@ export default function Bar() {
   );
 
   if (loading) {
-    return <div className="loading-div" width='950' height='650' >Loading...</div>;
+    return (
+      <>
+        <ResizableBox width='950' height='650'>
+          <div className="loading-div" width='950' height='650' >
+            <div className="overlay">
+                <div className="spinner"></div>
+            </div>
+          </div>
+        </ResizableBox>
+      </>
+      );
   }
   return (
     <>
-      <br />
-      <br />
-      <ResizableBox width='950' height='650'>
+      <ResizableBox width='950' height='650' color='gray'>
         <Chart
           options={{
             data,

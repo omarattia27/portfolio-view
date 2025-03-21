@@ -3,8 +3,10 @@
     justify-content: flex-start;
     align-items: flex-start;
     padding: 20px;
-    padding-top: 90px; /* Adjust for navbar height */
+    padding-top: 150px; /* Adjust for navbar height */
     width: 100%;
+    align-self: center;
+    justify-self: center;
   }
   
 .component-box {

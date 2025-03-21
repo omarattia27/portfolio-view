@@ -13,6 +13,7 @@
     "@syncfusion/ej2-react-dropdowns": "^28.1.41",
     "axios": "^1.7.7",
     "next": "^14.2.22",
+    "next-auth": "^4.24.11",
     "react": "^18.3.1",
     "react-charts": "^3.0.0-beta.57",
     "react-dom": "^18.3.1",

@@ -1,8 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import OAuth2AuthorizationCodeBearer
+from authlib.integrations.starlette_client import OAuth
 from fastapi.middleware.cors import CORSMiddleware
 from API import api_call 
 from pydantic import BaseModel
 from typing import List
+import requests
+import os
 
 dic_assets = {
     "Cash": "DX-Y.NYB", 
@@ -35,23 +39,6 @@ dic_assets = {
     "Bonds (VCSH)": "VCSH"
 }
 
-app = FastAPI()
-
-# Define the allowed origins (adjust as needed)
-origins = [
-    "http://localhost:3000",  # Allow requests from the Next.js frontend
-    # Add other allowed origins here if necessary
-]
-
-# Apply CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,  # List of allowed origins
-    allow_credentials=True,  # Allow cookies and credentials
-    allow_methods=["*"],     # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],     # Allow all headers
-)
-
 # Define the Loan model to represent individual loans
 class Loan(BaseModel):
     id: str
@@ -76,6 +63,58 @@ class RequestBody(BaseModel):
     PROVINCE: str
     LOANS: List[Loan]  # List of Loan objects
     ALLOCATION_INPUT_STATE: List[Allocation]
+
+
+app = FastAPI()
+
+# Define the allowed origins (adjust as needed)
+origins = [
+    "http://localhost:3000",  # Allow requests from the Next.js frontend
+    # Add other allowed origins here if necessary
+]
+
+# Apply CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # List of allowed origins
+    allow_credentials=True,  # Allow cookies and credentials
+    allow_methods=["*"],     # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],     # Allow all headers
+)
+
+# 🔹 Authentik OAuth2 Configuration
+AUTHENTIK_DOMAIN = "http://host.docker.internal:9000"
+AUTHENTIK_CLIENT_ID = os.getenv("AUTHENTIK_CLIENT_ID")
+AUTHENTIK_CLIENT_SECRET = os.getenv("AUTHENTIK_CLIENT_SECRET")
+
+print(AUTHENTIK_CLIENT_ID)
+print(AUTHENTIK_CLIENT_SECRET)
+
+oauth2_scheme = OAuth2AuthorizationCodeBearer(
+    authorizationUrl=f"{AUTHENTIK_DOMAIN}/application/o/authorize/",
+    tokenUrl=f"{AUTHENTIK_DOMAIN}/application/o/token/"
+)
+
+oauth = OAuth()
+oauth.register(
+    name="authentik",
+    client_id=AUTHENTIK_CLIENT_ID,
+    client_secret=AUTHENTIK_CLIENT_SECRET,
+    authorize_url=f"{AUTHENTIK_DOMAIN}/application/o/authorize/",
+    access_token_url=f"{AUTHENTIK_DOMAIN}/application/o/token/",
+    client_kwargs={"scope": "openid profile email"},
+)
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    print("===>  ", token)
+    user_info = requests.get(
+        f"{AUTHENTIK_DOMAIN}/application/o/userinfo/",  # FIXED!
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    if user_info.status_code != 200:
+        raise HTTPException(status_code=401, detail="Invalid authentication")
+
+    return user_info.json()
 
 @app.post("/data")
 async def read_user(data: RequestBody):
@@ -114,6 +153,40 @@ async def read_user(data: RequestBody):
     }
     
     return api_call(request_obj)
+
+# # 🔹 OAuth2 Dependency for Protected Routes
+# async def get_current_user(token: str = Depends(oauth2_scheme)):
+#     print("===>  ",token)
+#     user_info = requests.get(
+#         f"{AUTHENTIK_DOMAIN}/application/o/userinfo/", 
+#         headers={"Authorization": f"Bearer {token}"}
+#     )
+#     #print(token)
+#     print("user_info ===>   ",user_info)
+#     if user_info.status_code != 200:
+#         raise HTTPException(status_code=401, detail="Invalid authentication")
+    
+#     return user_info.json()
+
+# async def get_current_user(token: str = Depends(oauth2_scheme)):
+#     print(f"===> Received token: {token}")  # Debugging
+#     user_info = requests.get(
+#         f"{AUTHENTIK_DOMAIN}/application/o/portfolio/userinfo/",
+#         headers={"Authorization": f"Bearer {token}"}
+#     )
+#     print(f"===> Authentik response status: {user_info.status_code}")  # Debugging
+#     #print(f"===> Authentik response body: {user_info.text}")  # Debugging
+
+#     if user_info.status_code != 200:
+#         raise HTTPException(status_code=401, detail="Invalid authentication")
+
+#     return user_info.json()
+
+
+# 🔹 Protected API Route
+@app.get("/protected-data")
+async def protected_route(user: dict = Depends(get_current_user)):
+    return {"message": f"Hello, {user['preferred_username']}!"}
 
     # Call the financial_planner function with the appropriate arguments
     # return financial_planner(
