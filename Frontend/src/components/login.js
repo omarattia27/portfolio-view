@@ -55,8 +55,8 @@
 
 import { signIn, useSession } from "next-auth/react";
 
-const AUTHENTIK_SIGNUP_URL = "http://localhost:9000/if/flow/registration/";
-const AUTHENTIK_LOGIN_URL = "http://localhost:9000/application/o/portfolio/";
+const AUTHENTIK_SIGNUP_URL = "http://54.152.60.149:9000/if/flow/registration/";
+const AUTHENTIK_LOGIN_URL = "http://54.152.60.149:9000/application/o/portfolio/";
 
 export default function LoginPage() {
   const { data: session } = useSession();
@@ -68,7 +68,7 @@ export default function LoginPage() {
       <p>Sign in or sign up using Authentik SSO</p>
 
       <button 
-        onClick={() => signIn("authentik", { callbackUrl: "http://localhost:3000" })} 
+        onClick={() => signIn("authentik", { callbackUrl: "http://54.152.60.149:3000" })} 
         style={{
           padding: "10px 20px",
           fontSize: "16px",
