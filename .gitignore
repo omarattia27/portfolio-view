@@ -1,2 +1,4 @@
 .DS_Store
 .env
+Nginx/certs/selfsigned.crt
+Nginx/certs/selfsigned.key
