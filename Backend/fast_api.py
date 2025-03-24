@@ -69,7 +69,7 @@ app = FastAPI()
 
 # Define the allowed origins (adjust as needed)
 origins = [
-    "http://localhost:3000",  # Allow requests from the Next.js frontend
+    "https://localhost",  # Allow requests from the Next.js frontend
     # Add other allowed origins here if necessary
 ]
 

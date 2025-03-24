@@ -68,7 +68,7 @@ export default function LoginPage() {
       <p>Sign in or sign up using Authentik SSO</p>
 
       <button 
-        onClick={() => signIn("authentik", { callbackUrl: "http://localhost:3000" })} 
+        onClick={() => signIn("authentik", { callbackUrl: process.env.NEXTAUTH_URL})} 
         style={{
           padding: "10px 20px",
           fontSize: "16px",
